@@ -1,3 +1,4 @@
+import { ProjectsServiceInstance } from "./services/projects_service";
 import * as settings_config from "./settings_config";
 import * as stream_data from "./stream_data";
 import * as stream_topic_history from "./stream_topic_history";
@@ -6,9 +7,13 @@ import {user_settings} from "./user_settings";
 import * as util from "./util";
 
 let previous_pinned;
+let previous_project;
+let previous_system;
 let previous_normal;
 let previous_dormant;
 let previous_muted_active;
+let previous_muted_project;
+let previous_muted_system;
 let previous_muted_pinned;
 let all_streams = [];
 
@@ -91,9 +96,13 @@ export function sort_groups(streams, search_term) {
     }
 
     const pinned_streams = [];
+    const project_streams = [];
+    const system_streams = [];
     const normal_streams = [];
     const muted_pinned_streams = [];
     const muted_active_streams = [];
+    const muted_project_streams = [];
+    const muted_system_streams = [];
     const dormant_streams = [];
 
     for (const stream of streams) {
@@ -104,6 +113,20 @@ export function sort_groups(streams, search_term) {
                 pinned_streams.push(stream);
             } else {
                 muted_pinned_streams.push(stream);
+            }
+        } else if (['Headlines'].includes(stream_id_to_name(stream))) {
+            if (!sub.is_muted) {
+                system_streams.push(stream);
+            } else {
+                muted_system_streams.push(stream);
+            }
+        } else if (ProjectsServiceInstance.projects !== undefined &&  
+            /*['ALM DEMO','CRM-3000','Infrastructure','Newstation', 'S.Bot'].includes(stream_id_to_name(stream))*/
+            ProjectsServiceInstance.projects.includes(stream_id_to_name(stream))) {
+            if (!sub.is_muted) {
+                project_streams.push(stream);
+            } else {
+                muted_project_streams.push(stream);
             }
         } else if (is_normal(sub)) {
             if (!sub.is_muted) {
@@ -117,30 +140,46 @@ export function sort_groups(streams, search_term) {
     }
 
     pinned_streams.sort(compare_function);
+    project_streams.sort(compare_function);
+    system_streams.sort(compare_function);
     normal_streams.sort(compare_function);
     muted_pinned_streams.sort(compare_function);
+    muted_project_streams.sort(compare_function);
+    muted_system_streams.sort(compare_function);
     muted_active_streams.sort(compare_function);
     dormant_streams.sort(compare_function);
 
     const same_as_before =
         previous_pinned !== undefined &&
         util.array_compare(previous_pinned, pinned_streams) &&
+        util.array_compare(previous_project, project_streams) &&
+        util.array_compare(previous_system, system_streams) &&
         util.array_compare(previous_normal, normal_streams) &&
         util.array_compare(previous_muted_pinned, muted_pinned_streams) &&
+        util.array_compare(previous_muted_project, muted_project_streams) &&
+        util.array_compare(previous_muted_system, muted_system_streams) &&
         util.array_compare(previous_muted_active, muted_active_streams) &&
         util.array_compare(previous_dormant, dormant_streams);
 
     if (!same_as_before) {
         previous_pinned = pinned_streams;
+        previous_project = project_streams;
+        previous_system = system_streams;
         previous_normal = normal_streams;
         previous_muted_pinned = muted_pinned_streams;
+        previous_muted_project = muted_project_streams;
+        previous_muted_system = muted_system_streams;
         previous_muted_active = muted_active_streams;
         previous_dormant = dormant_streams;
 
         all_streams = [
             ...pinned_streams,
+            ...project_streams,
+            ...system_streams,
             ...muted_pinned_streams,
             ...normal_streams,
+            ...muted_project_streams,
+            ...muted_system_streams,
             ...muted_active_streams,
             ...dormant_streams,
         ];
@@ -149,9 +188,13 @@ export function sort_groups(streams, search_term) {
     return {
         same_as_before,
         pinned_streams,
+        project_streams,
+        system_streams,
         normal_streams,
         dormant_streams,
         muted_pinned_streams,
+        muted_project_streams,
+        muted_system_streams,
         muted_active_streams,
     };
 }

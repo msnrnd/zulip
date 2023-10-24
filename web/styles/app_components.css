@@ -589,6 +589,22 @@ div.overlay {
     opacity: 0.7;
 }
 
+.time-tracker-icon {
+    /* margin-right: 5px; */
+    /* margin-left: 2px; */
+    opacity: 0.7;
+    position: absolute;
+    display: inline;
+    right: 25px;
+    top: 3px;
+    cursor: pointer;
+    font-size: medium;
+    
+    &:hover {
+        color: hsl(128, 97%, 24%) !important;
+    }
+}
+
 /* Implement the web app's default-hidden convention for alert
    elements.  Portico pages lack this CSS and thus show them by
    default. */
@@ -633,6 +649,47 @@ div.overlay {
         display: revert;
     }
 }
+
+.animated-green-button {
+    color: hsl(0deg 0% 100%);
+    transition: all 80ms linear;
+    box-shadow: none;
+    /* This color just passes WCAG AA */
+    background-color: hsl(120, 96%, 28%);
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    white-space: nowrap;
+
+    &:hover {
+        /* This color passes WCAG AAA */
+        background-color: hsl(120, 96%, 16%);
+        box-shadow: 0 1px 4px hsl(0deg 0% 0% / 30%);
+    }
+
+    &:focus {
+        background-color: hsl(120, 96%, 16%);
+        box-shadow: 0 1px 4px 0 hsl(235deg 18% 7%);
+        outline: none;
+    }
+}
+
+.animated-timetracker-button {
+    @extend .animated-green-button;
+    &:disabled {
+        background-color: hsl(0, 0%, 19%);
+    }
+    .tracked {
+        background-color: hsl(216, 73%, 46%);
+    }
+}
+
+.animated-timetracker-button.tracked 
+{
+    background-color: hsl(216, 73%, 46%);
+}
+
 
 .animated-purple-button {
     color: hsl(0deg 0% 100%);

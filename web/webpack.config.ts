@@ -236,6 +236,13 @@ export default (
                 "Access-Control-Allow-Origin": "*",
                 "Timing-Allow-Origin": "*",
             },
+            proxy: {
+                '/workitems-api': {
+                  target: 'http://vdi-w10-12:5000/api/',
+                  pathRewrite: { '^/workitems-api': '' },
+                  changeOrigin: true,
+                },
+            }
         },
         infrastructureLogging: {
             level: "warn",

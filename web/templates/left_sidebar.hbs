@@ -1,4 +1,4 @@
-<div class="left-sidebar" id="left-sidebar" role="navigation">
+<div class="left-sidebar" id="left-sidebar" role="navigation" style="height: 100%">
     <div class="narrows_panel">
         <ul id="global_filters" class="filters">
             {{!-- Special-case this link so we don't actually go to page top. --}}
@@ -119,6 +119,29 @@
                     </a>
                 </div>
             </div>
+        </div>
+    </div>
+    <div id="timetracker_status_container" style="
+    position: absolute;
+    /* display: block; */
+    background-color: #e2edee;
+    /*bottom: 3rem;*/
+    width: 100%;
+    left: 0px;
+    bottom: 97px;
+    /*margin-right: 4px;*/
+    display: flex;
+    border: 1px solid var(--color-message-header-contents-border);
+    ">
+        <button id="timetracker_status_button" 
+            class="button small animated-timetracker-button time-tracker-button" style="margin-left: 10px;margin-bottom: 4px;margin-top: 4px;" disabled="disabled">
+            <span><i class="fa fa-play-circle" aria-hidden="true"></i></span>
+        </button>
+        <div id="timetracker_status" style="margin-left: 0.5rem; margin-top: 2px"></div>
+        <div id="timetracker_status_link" class="hidden" style="margin-left: auto; margin-top: auto; margin-right: 0.2rem;">
+            <a href="" target="_blank" rel="noopener noreferrer" class="no-underline">
+                <i class="fa fa-external-link-square" aria-label="External link"></i>
+            </a>
         </div>
     </div>
 </div>

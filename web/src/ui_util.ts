@@ -45,7 +45,7 @@ export function convert_enter_to_click(e: JQuery.KeyDownEvent): void {
     }
 }
 
-export function update_unread_count_in_dom($unread_count_elem: JQuery, count: number): void {
+export function update_unread_count_in_dom($unread_count_elem: JQuery, count: number): boolean {
     // This function is used to update unread count in top left corner
     // elements.
     const $unread_count_span = $unread_count_elem.find(".unread_count");
@@ -53,11 +53,15 @@ export function update_unread_count_in_dom($unread_count_elem: JQuery, count: nu
     if (count === 0) {
         $unread_count_span.hide();
         $unread_count_span.text("");
-        return;
+        return false;
     }
 
     $unread_count_span.show();
+    const previous_value = Number($unread_count_span.text());    
     $unread_count_span.text(count);
+    //console.log('ui_utils.js. update_unread_count_in_dom. previous_value and li', previous_value,  $unread_count_elem);
+    //console.log('ui_utils.js. update_unread_count_in_dom. count and li', count,  $unread_count_elem);
+    return previous_value !== count;
 }
 
 export function update_unread_mention_info_in_dom(

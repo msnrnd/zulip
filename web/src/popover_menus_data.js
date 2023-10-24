@@ -152,6 +152,20 @@ export function get_topic_popover_content_context({stream_id, topic_name, url}) 
     };
 }
 
+export function get_topic_timetacker_popover_content_context({stream_id, topic_name}) {
+    console.log('Debug. get_topic_timetacker_popover_content_context. page_params', page_params);
+    const sub = sub_store.get(stream_id);
+    return {
+        loading: true,
+        stream_name: sub.name,
+        stream_id: sub.stream_id,
+        topic_name,
+        color: sub.color,
+        development: page_params.development_environment,
+        work_items: []
+    };
+}
+
 export function get_change_visibility_policy_popover_content_context(stream_id, topic_name) {
     const visibility_policy = user_topics.get_topic_visibility_policy(stream_id, topic_name);
     const sub = sub_store.get(stream_id);
