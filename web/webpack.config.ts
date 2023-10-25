@@ -238,7 +238,7 @@ export default (
             },
             proxy: {
                 '/workitems-api': {
-                  target: 'http://dr-sqldev:12001/api/',
+                  target: 'https://dr-sqldev:12003/api/',
                   pathRewrite: { '^/workitems-api': '' },
                   changeOrigin: true,
                 },

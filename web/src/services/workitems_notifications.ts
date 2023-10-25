@@ -45,7 +45,7 @@ class WorkitemsNotifications {
 
     constructor() {
         this.connection = new HubConnectionBuilder()
-            .withUrl("http://dr-sqldev:12001/hubs/tracking", {withCredentials: true})
+            .withUrl("https://dr-sqldev:12003/hubs/tracking", {withCredentials: true})
             .withAutomaticReconnect([0, 2000, 10000, 30000, 60000, 120000, 300000, 90000, 1800000, 3600000, 3600000, 3600000, 3600000, 3600000, 3600000])
             .build();
 
