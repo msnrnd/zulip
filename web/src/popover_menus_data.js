@@ -153,7 +153,6 @@ export function get_topic_popover_content_context({stream_id, topic_name, url}) 
 }
 
 export function get_topic_timetacker_popover_content_context({stream_id, topic_name}) {
-    console.log('Debug. get_topic_timetacker_popover_content_context. page_params', page_params);
     const sub = sub_store.get(stream_id);
     return {
         loading: true,

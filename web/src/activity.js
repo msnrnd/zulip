@@ -220,7 +220,6 @@ export function mark_client_active() {
 }
 
 export function initialize() {
-    console.log('activity.js. initialize.');
     $("html").on("mousemove", () => {
         new_user_input = true;
     });

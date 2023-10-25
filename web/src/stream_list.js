@@ -475,8 +475,6 @@ class StreamSidebarRow {
             stream_has_any_unmuted_unread_mention,
             stream_has_only_muted_unread_mentions,
         );
-
-        console.log('stream_list.js StreamSidebarRow. update_unread_count() $stream_li', this.$list_item);
     }
 }
 
@@ -537,17 +535,10 @@ function set_stream_unread_count(
 
     if (count_updated) {
         const $sectionDivs = $stream_li.prevAll('div.streams_subheader');
-        console.log('stream_list.js set_stream_unread_count. $stream_li', $stream_li);
-        console.log('stream_list.js set_stream_unread_count. $sectionDiv', $sectionDivs.length, $sectionDivs);
          if ($sectionDivs.length > 0) {
             const $sectionDiv = $($sectionDivs[0]);
-            console.log('stream_list.js set_stream_unread_count. $sectionDiv[0]', $sectionDiv.length, $sectionDiv);
-            console.log('stream_list.js set_stream_unread_count. parent before', $sectionDiv.parent());
             $stream_li.insertAfter($sectionDiv);
-            console.log('stream_list.js set_stream_unread_count. parent after', $sectionDiv.parent());
-        }
-        
-        //$stream_li.parent.html("test");
+        }        
     }
 
 }

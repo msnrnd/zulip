@@ -190,20 +190,16 @@ function initialize_left_sidebar() {
         is_guest: page_params.is_guest,
     });
 
-    console.log('ui_util.js initialize_left_sidebar()');
-
     $("#left-sidebar-container").html(rendered_sidebar);
     $("#timetracker_status_button").on('click', on_timetracker_click);
     workitemsNotificationsPubSubInstance.subscribe(onWorkitemNotification);
 }
 
 function initialize_timetracker_handlers() {
-    console.log('ui_init.js. initialize_timetracker_handlers.');
     workitemsNotificationsPubSubInstance.subscribe(onWorkitemNotificationIpc);
 }
 
 function onWorkitemNotification(payload) {
-    console.log('ui_init.js. onWorkitemNotification. payload', payload);
     const $timeTrackerLinkContainer = $("#timetracker_status_link");
     const $timeTrackerLinkContainerLink = $("#timetracker_status_link > a");
     if (payload.id > 0) {
@@ -219,14 +215,13 @@ function onWorkitemNotification(payload) {
         $("#timetracker_status_button").removeData('taskId');
         $('#timetracker_status_button').prop('disabled', 'disabled');
         $timeTrackerLinkContainerLink.attr('href', '');
-        $timeTrackerLinkContainer.css('hidden');
+        $timeTrackerLinkContainer.addClass('hidden');
 
         setTrackingStyles(false);  
     }          
 }
 
 function onWorkitemNotificationIpc(payload) {
-    console.log('ui_init.js. onWorkitemNotificationIpc. payload', payload);
     if (
         window.ttn_plugin_bridge !== undefined &&
         window.ttn_plugin_bridge.send_start_tracking !== undefined
@@ -238,14 +233,11 @@ function onWorkitemNotificationIpc(payload) {
 
 async function on_timetracker_click(e)  
 {
-    console.log('on_timetracker_click', e);
-    const button = $(e.currentTarget);
-    const id = button.data('taskId');
-    console.log('on_timetracker_click. target', button);
-    console.log('on_timetracker_click. id', id);
+    const $button = $(e.currentTarget);
+    const id = $button.data('taskId');
     
     const service = new WorkItemsService();
-    if (button.hasClass('tracked')) {
+    if ($button.hasClass('tracked')) {
         setTrackingStyles(false);
         await service.stopTracking(id);
     }

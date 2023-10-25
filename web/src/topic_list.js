@@ -146,7 +146,6 @@ export class TopicListWidget {
         const attrs = [["class", "topic-list"]];
 
         const nodes = list_info.items.map((conversation) => keyed_topic_li({can_be_tracked: conversation.topic_name.startsWith('#'), ...conversation}));
-        console.log('Debug. build_list. nodes', nodes);
 
         if (spinner) {
             nodes.push(spinner_li());
@@ -307,8 +306,6 @@ export function get_topic_search_term() {
 
 export function initialize({on_topic_click}) {
     $("#stream_filters").on("click", ".topic-box", (e) => {
-        console.log('Debug.');
-
         if (e.metaKey || e.ctrlKey) {
             return;
         }

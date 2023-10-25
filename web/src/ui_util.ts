@@ -59,8 +59,6 @@ export function update_unread_count_in_dom($unread_count_elem: JQuery, count: nu
     $unread_count_span.show();
     const previous_value = Number($unread_count_span.text());    
     $unread_count_span.text(count);
-    //console.log('ui_utils.js. update_unread_count_in_dom. previous_value and li', previous_value,  $unread_count_elem);
-    //console.log('ui_utils.js. update_unread_count_in_dom. count and li', count,  $unread_count_elem);
     return previous_value !== count;
 }
 
