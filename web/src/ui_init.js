@@ -85,6 +85,10 @@ import * as scroll_util from "./scroll_util";
 import * as search from "./search";
 import * as sent_messages from "./sent_messages";
 import * as server_events from "./server_events";
+import { ProjectsServiceInstance } from "./services/projects_service";
+import workitemsNotificationsPubSubInstance from "./services/workitems_notifications";
+import * as workitems_notifications from "./services/workitems_notifications";
+import { WorkItemsService } from "./services/workitems_service";
 import * as settings from "./settings";
 import * as settings_data from "./settings_data";
 import * as settings_display from "./settings_display";
@@ -122,6 +126,7 @@ import {initialize_user_settings, user_settings} from "./user_settings";
 import * as user_status from "./user_status";
 import * as user_status_ui from "./user_status_ui";
 import * as user_topics from "./user_topics";
+
 
 // This is where most of our initialization takes place.
 // TODO: Organize it a lot better.  In particular, move bigger
@@ -186,6 +191,71 @@ function initialize_left_sidebar() {
     });
 
     $("#left-sidebar-container").html(rendered_sidebar);
+    $("#timetracker_status_button").on('click', on_timetracker_click);
+    workitemsNotificationsPubSubInstance.subscribe(onWorkitemNotification);
+}
+
+function initialize_timetracker_handlers() {
+    workitemsNotificationsPubSubInstance.subscribe(onWorkitemNotificationIpc);
+}
+
+function onWorkitemNotification(payload) {
+    const $timeTrackerLinkContainer = $("#timetracker_status_link");
+    const $timeTrackerLinkContainerLink = $("#timetracker_status_link > a");
+    if (payload.id > 0) {
+        $("#timetracker_status").text(`#${payload.id} - ${payload?.title}`);
+        $("#timetracker_status_button").data('taskId', payload.id);
+        $('#timetracker_status_button').prop('disabled', '');
+        $timeTrackerLinkContainerLink.attr('href', payload.url);
+        $timeTrackerLinkContainer.removeClass('hidden');
+        setTrackingStyles(payload.isBeingTracked);  
+    }
+    else {
+        $("#timetracker_status").text('');
+        $("#timetracker_status_button").removeData('taskId');
+        $('#timetracker_status_button').prop('disabled', 'disabled');
+        $timeTrackerLinkContainerLink.attr('href', '');
+        $timeTrackerLinkContainer.addClass('hidden');
+
+        setTrackingStyles(false);  
+    }          
+}
+
+function onWorkitemNotificationIpc(payload) {
+    if (
+        window.ttn_plugin_bridge !== undefined &&
+        window.ttn_plugin_bridge.send_start_tracking !== undefined
+    ) {
+        window.ttn_plugin_bridge.send_start_tracking(payload.id);
+    }
+   
+}
+
+async function on_timetracker_click(e)  
+{
+    const $button = $(e.currentTarget);
+    const id = $button.data('taskId');
+    
+    const service = new WorkItemsService();
+    if ($button.hasClass('tracked')) {
+        setTrackingStyles(false);
+        await service.stopTracking(id);
+    }
+    else {
+        setTrackingStyles(true);
+        await service.startTracking(id);
+    }
+}
+
+function setTrackingStyles(isTracked) {
+    if (isTracked) {
+        $('#timetracker_status_button > span > i').addClass('fa-pause-circle');
+        $('#timetracker_status_button').addClass('tracked', '');
+    } 
+    else {
+        $('#timetracker_status_button > span > i').removeClass('fa-pause-circle');
+        $('#timetracker_status_button').removeClass('tracked', '');
+    }
 }
 
 function initialize_right_sidebar() {
@@ -652,6 +722,7 @@ export function initialize_everything() {
     // modules were migrated from Django templates to Handlebars).
     initialize_bottom_whitespace();
     initialize_left_sidebar();
+    initialize_timetracker_handlers();
     initialize_right_sidebar();
     initialize_compose_box();
     settings.initialize();
@@ -737,6 +808,7 @@ export function initialize_everything() {
     settings_sections.initialize();
     settings_toggle.initialize();
     about_zulip.initialize();
+    workitems_notifications.initializeWorkitemsNotifications();    
 
     // All overlays must be initialized before hashchange.js
     hashchange.initialize();
@@ -768,6 +840,8 @@ export function initialize_everything() {
     fenced_code.initialize(generated_pygments_data);
     message_edit_history.initialize();
     hotkey.initialize();
+
+    ProjectsServiceInstance.init();
 
     $("#app-loading").addClass("loaded");
 }

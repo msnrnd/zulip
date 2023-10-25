@@ -236,6 +236,13 @@ export default (
                 "Access-Control-Allow-Origin": "*",
                 "Timing-Allow-Origin": "*",
             },
+            proxy: {
+                '/workitems-api': {
+                  target: 'http://dr-sqldev:12001/api/',
+                  pathRewrite: { '^/workitems-api': '' },
+                  changeOrigin: true,
+                },
+            }
         },
         infrastructureLogging: {
             level: "warn",

@@ -112,7 +112,7 @@ export function get_list_info(stream_id, zoomed, search_term) {
         more_topics_have_unread_mention_messages: false,
         more_topics_have_muted_unread_mention_messages: false,
         active_topic: narrow_state.topic()?.toLowerCase(),
-        topics_with_unread_mentions: unread.get_topics_with_unread_mentions(stream_id),
+        topics_with_unread_mentions: unread.get_topics_with_unread_mentions(stream_id),        
     };
 
     const stream_muted = sub_store.get(stream_id).is_muted;

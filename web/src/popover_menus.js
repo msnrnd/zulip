@@ -19,6 +19,7 @@ import render_send_later_modal from "../templates/send_later_modal.hbs";
 import render_send_later_popover from "../templates/send_later_popover.hbs";
 import render_starred_messages_sidebar_actions from "../templates/starred_messages_sidebar_actions.hbs";
 import render_topic_sidebar_actions from "../templates/topic_sidebar_actions.hbs";
+import render_topic_timetracker_actions from "../templates/topic_sidebar_timetracker_actions.hbs";
 
 import * as blueslip from "./blueslip";
 import * as channel from "./channel";
@@ -44,6 +45,7 @@ import * as popovers from "./popovers";
 import * as read_receipts from "./read_receipts";
 import * as rows from "./rows";
 import * as scheduled_messages from "./scheduled_messages";
+import { WorkItemsService } from "./services/workitems_service";
 import * as settings_data from "./settings_data";
 import * as starred_messages from "./starred_messages";
 import * as starred_messages_ui from "./starred_messages_ui";
@@ -68,6 +70,7 @@ const popover_instances = {
     compose_mobile_button: null,
     compose_enter_sends: null,
     topics_menu: null,
+    timetracker_menu: null,
     send_later: null,
     change_visibility_policy: null,
 };
@@ -82,6 +85,10 @@ export function get_visible_instance() {
 }
 export function get_topic_menu_popover() {
     return popover_instances.topics_menu;
+}
+
+export function get_timetracker_menu_popover() {
+    return popover_instances.timetracker_menu;
 }
 
 export function get_selected_send_later_timestamp() {
@@ -591,6 +598,72 @@ export function initialize() {
             instance.destroy();
             popover_instances.topics_menu = undefined;
         },
+    });
+
+    register_popover_menu("#stream_filters .time-tracker-icon", {
+        ...left_sidebar_tippy_options,
+        onShow(instance) {
+            popover_instances.timetracker_menu = instance;
+            on_show_prep(instance);
+            const elt = $(instance.reference).closest(".time-tracker-icon").expectOne()[0];
+            const $stream_li = $(elt).closest(".narrow-filter").expectOne();
+            const topic_name = $(elt).closest("li").expectOne().attr("data-topic-name");            
+            const stream_id = stream_popover.elem_to_stream_id($stream_li);
+
+            instance.context = popover_menus_data.get_topic_timetacker_popover_content_context({
+                stream_id,
+                topic_name,
+            });
+            instance.setProps({loading: true});
+            instance.setContent(parse_html(render_topic_timetracker_actions(instance.context)));
+            setTimeout(async () => {
+                const service = new WorkItemsService();
+                const data = await service.getWorkItems(topic_name);
+                instance.context.loading = false;
+                instance.context.work_items = data;
+                instance.setContent(parse_html(render_topic_timetracker_actions(instance.context)));
+            }, 3000);
+            
+        },
+        onMount(instance) {
+            const {stream_id} = instance.context;
+
+            if (!stream_id) {
+                instance.hide();
+                return;
+            }
+        },
+        onHidden(instance) {
+            instance.destroy();
+            popover_instances.timetracker_menu = undefined;
+        },
+
+        onAfterUpdate(instance) {
+            if (instance.context.loading) 
+            {
+                return;
+            }   
+            
+            const $popper = $(instance.popper);
+
+            $popper.one("click", ".time-tracker-button", async (e) => {
+                const id = e.currentTarget.dataset.workitemId;
+                const isBeingTracked = ('workitemTracked' in e.currentTarget.dataset);
+                const initialClass = isBeingTracked ? "fa-pause-circle" : "fa-play-circle";   
+                const $foundElements = $(e.currentTarget).find("i");
+
+                $($foundElements).removeClass(initialClass);
+                $($foundElements).addClass("fa-spinner fa-pulse");
+                const service = new WorkItemsService();
+                if (isBeingTracked) {
+                    await service.stopTracking(id);
+                }
+                else {
+                    await service.startTracking(id);
+                }                
+                instance.hide();
+            });
+        }
     });
 
     register_popover_menu(".open_enter_sends_dialog", {

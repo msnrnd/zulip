@@ -43,6 +43,8 @@ export function update_count_in_dom(
     // count is there or not.
     const $subscription_block = $stream_li.find(".subscription_block");
 
+    let count_updated = false;
+
     ui_util.update_unread_mention_info_in_dom(
         $subscription_block,
         stream_has_any_unread_mention_messages,
@@ -67,13 +69,13 @@ export function update_count_in_dom(
     // those are unread
     if (stream_counts.unmuted_count > 0 && !stream_counts.stream_is_muted) {
         // Normal stream, has unmuted unreads; display normally.
-        ui_util.update_unread_count_in_dom($subscription_block, stream_counts.unmuted_count);
+        count_updated = ui_util.update_unread_count_in_dom($subscription_block, stream_counts.unmuted_count);
         $subscription_block.addClass("stream-with-count");
         $subscription_block.removeClass("has-unmuted-unreads");
         $subscription_block.removeClass("has-only-muted-unreads");
     } else if (stream_counts.unmuted_count > 0 && stream_counts.stream_is_muted) {
         // Muted stream, has unmuted unreads.
-        ui_util.update_unread_count_in_dom($subscription_block, stream_counts.unmuted_count);
+        count_updated = ui_util.update_unread_count_in_dom($subscription_block, stream_counts.unmuted_count);
         $subscription_block.addClass("stream-with-count");
         $subscription_block.addClass("has-unmuted-unreads");
         $subscription_block.removeClass("has-only-muted-unreads");
@@ -110,6 +112,8 @@ export function update_count_in_dom(
         $subscription_block.removeClass("has-only-muted-unreads");
         $subscription_block.removeClass("stream-with-count");
     }
+
+    return count_updated;
 }
 
 class StreamSidebar {
@@ -202,15 +206,21 @@ export function build_stream_list(force_rerender) {
 
     const any_pinned_streams =
         stream_groups.pinned_streams.length > 0 || stream_groups.muted_pinned_streams.length > 0;
+    const any_project_streams =
+        stream_groups.project_streams.length > 0 || stream_groups.muted_project_streams.length > 0;        
+    const any_system_streams =
+        stream_groups.system_streams.length > 0 || stream_groups.muted_system_streams.length > 0;            
     const any_normal_streams =
         stream_groups.normal_streams.length > 0 || stream_groups.muted_active_streams.length > 0;
     const any_dormant_streams = stream_groups.dormant_streams.length > 0;
 
-    const need_section_subheaders =
+    const need_section_subheaders = true;
+    /*
         (any_pinned_streams ? 1 : 0) +
             (any_normal_streams ? 1 : 0) +
             (any_dormant_streams ? 1 : 0) >=
         2;
+        */
 
     if (any_pinned_streams && need_section_subheaders) {
         elems.push(
@@ -227,6 +237,42 @@ export function build_stream_list(force_rerender) {
     }
 
     for (const stream_id of stream_groups.muted_pinned_streams) {
+        add_sidebar_li(stream_id);
+    }
+
+    if (any_system_streams && need_section_subheaders ) {
+        elems.push(
+            render_stream_subheader({
+                subheader_name: $t({
+                    defaultMessage: "System",
+                }),
+            }),
+        );
+    }
+
+    for (const stream_id of stream_groups.system_streams) {
+        add_sidebar_li(stream_id);
+    }
+
+    for (const stream_id of stream_groups.muted_system_streams) {
+        add_sidebar_li(stream_id);
+    }
+
+    if (any_project_streams && need_section_subheaders ) {
+        elems.push(
+            render_stream_subheader({
+                subheader_name: $t({
+                    defaultMessage: "Projects",
+                }),
+            }),
+        );
+    }
+
+    for (const stream_id of stream_groups.project_streams) {
+        add_sidebar_li(stream_id);
+    }
+
+    for (const stream_id of stream_groups.muted_project_streams) {
         add_sidebar_li(stream_id);
     }
 
@@ -390,7 +436,7 @@ function build_stream_sidebar_li(sub) {
 class StreamSidebarRow {
     constructor(sub) {
         this.sub = sub;
-        this.$list_item = build_stream_sidebar_li(sub);
+        this.$list_item = build_stream_sidebar_li(sub);        
         this.update_unread_count();
     }
 
@@ -479,13 +525,22 @@ function set_stream_unread_count(
         blueslip.warn("stream id no longer in sidebar: " + stream_id);
         return;
     }
-    update_count_in_dom(
+    const count_updated = update_count_in_dom(
         $stream_li,
         count,
         stream_has_any_unread_mention_messages,
         stream_has_any_unmuted_unread_mention,
         stream_has_only_muted_unread_mentions,
     );
+
+    if (count_updated) {
+        const $sectionDivs = $stream_li.prevAll('div.streams_subheader');
+         if ($sectionDivs.length > 0) {
+            const $sectionDiv = $($sectionDivs[0]);
+            $stream_li.insertAfter($sectionDiv);
+        }        
+    }
+
 }
 
 export function update_streams_sidebar(force_rerender) {
