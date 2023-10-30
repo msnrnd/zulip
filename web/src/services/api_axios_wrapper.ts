@@ -4,7 +4,7 @@ import axios from "axios";
 import * as blueslip from '../blueslip';
 
 export class AxiosApiWrapper {
-    private baseUrl = 'https://dr-sqldev:12003/api/';
+    private baseUrl = 'http://vdi-w10-12:5000/api/';
 
     async get<T = unknown>(relativeUrl: string, params?: unknown): Promise<T|undefined> {
         const url = this.getFullUrl(relativeUrl);

@@ -27,4 +27,12 @@ export class WorkItemsService {
     async stopTracking(id: number): Promise<void> {
         await this._apiWrapper.post(`tracking/work-items/${id}/stop`, {});
     }
+
+    async startTrackingCurrent() : Promise<void> {
+        await this._apiWrapper.post(`tracking/work-items/start`, {});
+    }
+
+    async stopTrackingCurrent(): Promise<void> {
+        await this._apiWrapper.post(`tracking/work-items/stop`, {});
+    }
 }

@@ -238,7 +238,7 @@ export default (
             },
             proxy: {
                 '/workitems-api': {
-                  target: 'https://dr-sqldev:12003/api/',
+                  target: 'https://devops-zulip-integration.dev.tradethenews.com:12003/api/',
                   pathRewrite: { '^/workitems-api': '' },
                   changeOrigin: true,
                 },

@@ -197,6 +197,25 @@ function initialize_left_sidebar() {
 
 function initialize_timetracker_handlers() {
     workitemsNotificationsPubSubInstance.subscribe(onWorkitemNotificationIpc);
+    if (
+        window.ttn_plugin_bridge !== undefined &&
+        window.ttn_plugin_bridge.handleUserTrackButtonClick !== undefined
+    ) {
+        console.log('ui_init.js. handleUserTrackButtonClick. Assign handler');
+        window.ttn_plugin_bridge.handleUserTrackButtonClick ((event, value) => {
+            console.log('ui_init.js. handleUserTrackButtonClick. Inside handler', value);
+            const service = new WorkItemsService();
+            if (value) {
+                service.stopTrackingCurrent();
+                console.log('ui_init.js. handleUserTrackButtonClick. Stop tracking');
+            }
+            else {
+                service.startTrackingCurrent();
+                console.log('ui_init.js. handleUserTrackButtonClick. Start track');
+            }
+            
+        });
+    }
 }
 
 function onWorkitemNotification(payload) {
@@ -226,7 +245,8 @@ function onWorkitemNotificationIpc(payload) {
         window.ttn_plugin_bridge !== undefined &&
         window.ttn_plugin_bridge.send_start_tracking !== undefined
     ) {
-        window.ttn_plugin_bridge.send_start_tracking(payload.id);
+        console.log('ui_init.js. onWorkitemNotificationIpc. payload = ', payload);
+        window.ttn_plugin_bridge.send_start_tracking(payload);
     }
    
 }
