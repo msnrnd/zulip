@@ -199,21 +199,16 @@ function initialize_timetracker_handlers() {
     workitemsNotificationsPubSubInstance.subscribe(onWorkitemNotificationIpc);
     if (
         window.ttn_plugin_bridge !== undefined &&
-        window.ttn_plugin_bridge.handleUserTrackButtonClick !== undefined
-    ) {
-        console.log('ui_init.js. handleUserTrackButtonClick. Assign handler');
-        window.ttn_plugin_bridge.handleUserTrackButtonClick ((event, value) => {
-            console.log('ui_init.js. handleUserTrackButtonClick. Inside handler', value);
+        window.ttn_plugin_bridge.user_clicked_tracking_button !== undefined
+    ) {        
+        window.ttn_plugin_bridge.user_clicked_tracking_button((value) => {
             const service = new WorkItemsService();
             if (value) {
-                service.stopTrackingCurrent();
-                console.log('ui_init.js. handleUserTrackButtonClick. Stop tracking');
+                service.startTrackingCurrent();
             }
             else {
-                service.startTrackingCurrent();
-                console.log('ui_init.js. handleUserTrackButtonClick. Start track');
-            }
-            
+                service.stopTrackingCurrent();
+            }            
         });
     }
 }
@@ -241,6 +236,7 @@ function onWorkitemNotification(payload) {
 }
 
 function onWorkitemNotificationIpc(payload) {
+    console.log('ui_init.js. window.ttn_plugin_bridge.', window.ttn_plugin_bridge);
     if (
         window.ttn_plugin_bridge !== undefined &&
         window.ttn_plugin_bridge.send_start_tracking !== undefined
