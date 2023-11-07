@@ -196,19 +196,21 @@ function initialize_left_sidebar() {
 }
 
 function initialize_timetracker_handlers() {
+    console.log('ui_init.js. initialize_timetracker_handlers. Initialize');
     workitemsNotificationsPubSubInstance.subscribe(onWorkitemNotificationIpc);
     if (
         window.ttn_plugin_bridge !== undefined &&
         window.ttn_plugin_bridge.user_clicked_tracking_button !== undefined
     ) {        
         window.ttn_plugin_bridge.user_clicked_tracking_button((value) => {
+            console.log('ui_init.js. initialize_timetracker_handlers. user_clicked_tracking_button. value = ', value);
             const service = new WorkItemsService();
             if (value) {
                 service.startTrackingCurrent();
             }
             else {
                 service.stopTrackingCurrent();
-            }            
+            }
         });
     }
 }
@@ -236,12 +238,10 @@ function onWorkitemNotification(payload) {
 }
 
 function onWorkitemNotificationIpc(payload) {
-    console.log('ui_init.js. window.ttn_plugin_bridge.', window.ttn_plugin_bridge);
     if (
         window.ttn_plugin_bridge !== undefined &&
         window.ttn_plugin_bridge.send_start_tracking !== undefined
-    ) {
-        console.log('ui_init.js. onWorkitemNotificationIpc. payload = ', payload);
+    ) {        
         window.ttn_plugin_bridge.send_start_tracking(payload);
     }
    
